@@ -23,9 +23,6 @@ public class SpotLightController : MonoBehaviour
     [Range(0f, 5f)]
     public float lightIntensity = 1.5f;
 
-    [Header("先端の円")]
-    public Transform lightCircle;
-
     private Light2D spotLight;
 
     void Awake()
@@ -62,24 +59,5 @@ public class SpotLightController : MonoBehaviour
         // ライトの角度
         spotLight.pointLightOuterAngle = lightAngle;
 
-        // 先端の円
-        if (lightCircle != null)
-        {
-            // ライトの向いている方向
-            Vector3 direction = transform.up;
-
-            // 円の位置
-            lightCircle.position =
-                transform.position + direction * lightDistance;
-
-            // 角度と距離から円の直径を計算
-            float size =
-                2f * lightDistance *
-                Mathf.Tan(lightAngle * 0.5f * Mathf.Deg2Rad);
-
-            // 円のサイズを変更
-            lightCircle.localScale =
-                new Vector3(size, size, 1f);
         }
     }
-}
