@@ -1,63 +1,81 @@
+
 using UnityEngine;
 using UnityEngine.Rendering.Universal;
 
+/// <summary>
+///     スポットライトの位置・向き・距離・角度・強さを制御する。
+/// </summary>
 [RequireComponent(typeof(Light2D))]
 public class SpotLightController : MonoBehaviour
 {
     [Header("位置")]
-    public Vector3 lightPosition = new Vector3(0, 5, 0);
+    [SerializeField, Tooltip("ライトのワールド座標。")]
+    private Vector3 _lightPosition = new Vector3(0f, 5f, 0f);
 
     [Header("向き")]
-    [Range(0f, 360f)]
-    public float lightRotation = 0f;
+    [SerializeField, Range(0f, 360f), Tooltip("ライトの回転角度。")]
+    private float _lightRotation;
 
     [Header("距離")]
-    [Range(0.1f, 20f)]
-    public float lightDistance = 5f;
+    [SerializeField, Range(0.1f, 20f), Tooltip("ライトの照射距離。")]
+    private float _lightDistance = 5f;
 
     [Header("角度")]
-    [Range(1f, 170f)]
-    public float lightAngle = 60f;
+    [SerializeField, Range(1f, 170f), Tooltip("ライトの照射角度。")]
+    private float _lightAngle = 60f;
 
     [Header("光の強さ")]
-    [Range(0f, 5f)]
-    public float lightIntensity = 1.5f;
+    [SerializeField, Range(0f, 5f), Tooltip("ライトの明るさ。")]
+    private float _lightIntensity = 1.5f;
 
-    private Light2D spotLight;
+    private Light2D _spotLight;
 
-    void Awake()
+    /// <summary>
+    ///     ライトの参照を取得して設定を反映する。
+    /// </summary>
+    private void Awake()
     {
-        spotLight = GetComponent<Light2D>();
+        _spotLight = GetComponent<Light2D>();
         ApplySettings();
     }
 
-    void OnValidate()
+    /// <summary>
+    ///     Inspectorで設定値が変更されたときにライトへ反映する。
+    /// </summary>
+    private void OnValidate()
     {
-        spotLight = GetComponent<Light2D>();
-
-        if (spotLight != null)
+        if (!TryGetComponent<Light2D>(out _spotLight))
         {
-            ApplySettings();
+            return;
         }
+
+        ApplySettings();
     }
 
-    void ApplySettings()
+    /// <summary>
+    ///     Inspectorで設定した5項目をライトに反映する。
+    /// </summary>
+    private void ApplySettings()
     {
-        // ライトの位置
-        transform.position = lightPosition;
-
-        // ライトの向き
-        transform.rotation =
-            Quaternion.Euler(0f, 0f, lightRotation);
-
-        // ライトの強さ
-        spotLight.intensity = lightIntensity;
-
-        // ライトの照射距離
-        spotLight.pointLightOuterRadius = lightDistance;
-
-        // ライトの角度
-        spotLight.pointLightOuterAngle = lightAngle;
-
+        if (_spotLight == null)
+        {
+            return;
         }
+
+        // ライトの位置を設定する。
+        transform.position = _lightPosition;
+
+        // ライトの向きを設定する。
+        transform.rotation =
+            Quaternion.Euler(0f, 0f, _lightRotation);
+
+        // ライトの強さを設定する。
+        _spotLight.intensity = _lightIntensity;
+
+        // ライトの照射距離を設定する。
+        _spotLight.pointLightOuterRadius = _lightDistance;
+
+        // ライトの照射角度を設定する。
+        _spotLight.pointLightOuterAngle = _lightAngle;
     }
+}
