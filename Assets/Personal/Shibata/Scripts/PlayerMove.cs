@@ -4,44 +4,62 @@ using UnityEngine.InputSystem;
 [RequireComponent(typeof(BoxCollider2D))]
 public class PlayerMove : MonoBehaviour
 {
-    public Vector2 MoveVec { get => _moveVec; }
-    private float _moveSpeed = 3f;
-    private Vector2 _moveVec;
-    private Quaternion _lastRotation;
-    private bool _isMoving = false;
+    public Vector2 MoveVec => _moveVec;
 
+    [Header("移動速度")]
+    [SerializeField,Tooltip("プレイヤーの秒速")]
+    private float _moveSpeed = 3f;
+    private const float _intialAngle = -90f;
+
+    private Vector2 _moveVec;
+    private Vector2 _lastVec = Vector2.down;
+    private Quaternion _lastRotation;
+
+    /// <summary>
+    /// PlayerInputから移動方向を取得
+    /// </summary>
+    /// <param name="context">入力アクションのコールバック情報</param>
     public void Move(InputAction.CallbackContext context)
     {
         if (context.canceled)
         {
-            _isMoving = false;
+            _lastVec = _moveVec;
             _moveVec = Vector2.zero;
             return;
         }
-
         _moveVec = context.ReadValue<Vector2>().normalized;
-        _isMoving = true;
+    }
+
+    /// <summary>
+    /// 初期方向を設定
+    /// </summary>
+    private void Awake()
+    {
+        transform.rotation = Quaternion.Euler(0, 0, _intialAngle);
+        _lastRotation = transform.rotation;
     }
 
     private void Update()
     {
-        MoveUpdata();
+        MoveUpdate();
     }
 
-    private void MoveUpdata()
+    /// <summary>
+    /// プレイヤーの移動と向きの計算、止まった時には最後移動した方向を向くようにしました。
+    /// </summary>
+    private void MoveUpdate()
     {
-        if (_isMoving)
-        {
-            Vector3 move = new Vector3(_moveVec.x, _moveVec.y, 0);
-            transform.Translate(move * _moveSpeed * Time.deltaTime, Space.World);
-
-            float angle = Mathf.Atan2(_moveVec.y, _moveVec.x) * Mathf.Rad2Deg;
-            transform.rotation = Quaternion.Euler(0, 0, angle);
-            _lastRotation = Quaternion.Euler(0, 0, angle);
-        }
-        else
+        if (_moveVec == Vector2.zero)
         {
             transform.rotation = _lastRotation;
+            return;
         }
+
+        Vector3 move = new Vector3(_moveVec.x, _moveVec.y, 0);
+        transform.Translate(move * _moveSpeed * Time.deltaTime, Space.World);
+
+        float angle = Mathf.Atan2(_moveVec.y, _moveVec.x) * Mathf.Rad2Deg;
+        transform.rotation = Quaternion.Euler(0, 0, angle);
+        _lastRotation = Quaternion.Euler(0, 0, angle);
     }
 }
