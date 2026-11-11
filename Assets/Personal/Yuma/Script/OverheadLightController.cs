@@ -19,8 +19,8 @@ public class OverheadLightController : MonoBehaviour
     [SerializeField, Tooltip("左右の移動距離。")]
     private float _moveDistance = 3f;
 
-    [SerializeField, Tooltip("左右の移動速度。")]
-    private float _moveSpeed = 1f;
+    [SerializeField, Tooltip("ライトが往復する速さ。")]
+    private float _oscillationSpeed = 1f;
 
     [Header("照射範囲のサイズ")]
     [SerializeField, Min(0.1f), Tooltip("照射範囲の横幅。")]
@@ -30,6 +30,7 @@ public class OverheadLightController : MonoBehaviour
     private float _lightHeight = 3f;
 
     private Vector3 _startPosition;
+    private float _elapsedTime;
 
     /// <summary>
     ///     Inspectorの設定変更を反映する。
@@ -45,7 +46,16 @@ public class OverheadLightController : MonoBehaviour
     }
 
     /// <summary>
-    ///     初期位置を保存して照射範囲を設定する。
+    ///     最初に配置された位置を移動の基準として保存する。
+    /// </summary>
+    private void Awake()
+    {
+        _startPosition = transform.position;
+        _elapsedTime = 0f;
+    }
+
+    /// <summary>
+    ///     ライトの参照を確認して照射範囲を設定する。
     /// </summary>
     private void Start()
     {
@@ -59,22 +69,21 @@ public class OverheadLightController : MonoBehaviour
             return;
         }
 
-        _startPosition = _lightArea.position;
         ApplyLightSize();
     }
 
     /// <summary>
-    ///     ライトと照射範囲を左右に移動させる。
+    ///     ライト自身の経過時間を使って親オブジェクトを左右に移動させる。
     /// </summary>
     private void Update()
     {
-        float x = Mathf.Sin(Time.time * _moveSpeed) * _moveDistance;
+        _elapsedTime += Time.deltaTime;
 
-        Vector3 targetPosition =
+        float x =
+            Mathf.Sin(_elapsedTime * _oscillationSpeed) * _moveDistance;
+
+        transform.position =
             _startPosition + new Vector3(x, 0f, 0f);
-
-        _lightArea.position = targetPosition;
-        _overheadLight.transform.position = targetPosition;
     }
 
     /// <summary>
