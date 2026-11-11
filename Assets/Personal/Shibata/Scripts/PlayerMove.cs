@@ -9,11 +9,9 @@ public class PlayerMove : MonoBehaviour
     [Header("移動速度")]
     [SerializeField,Tooltip("プレイヤーの秒速")]
     private float _moveSpeed = 3f;
-    private const float _intialAngle = -90f;
+    private const float _initialAngle = -90f;
 
     private Vector2 _moveVec;
-    private Vector2 _lastVec = Vector2.down;
-    private Quaternion _lastRotation;
 
     /// <summary>
     /// PlayerInputから移動方向を取得
@@ -23,7 +21,6 @@ public class PlayerMove : MonoBehaviour
     {
         if (context.canceled)
         {
-            _lastVec = _moveVec;
             _moveVec = Vector2.zero;
             return;
         }
@@ -35,8 +32,7 @@ public class PlayerMove : MonoBehaviour
     /// </summary>
     private void Awake()
     {
-        transform.rotation = Quaternion.Euler(0, 0, _intialAngle);
-        _lastRotation = transform.rotation;
+        transform.rotation = Quaternion.Euler(0, 0, _initialAngle);
     }
 
     private void Update()
@@ -51,7 +47,6 @@ public class PlayerMove : MonoBehaviour
     {
         if (_moveVec == Vector2.zero)
         {
-            transform.rotation = _lastRotation;
             return;
         }
 
@@ -60,6 +55,5 @@ public class PlayerMove : MonoBehaviour
 
         float angle = Mathf.Atan2(_moveVec.y, _moveVec.x) * Mathf.Rad2Deg;
         transform.rotation = Quaternion.Euler(0, 0, angle);
-        _lastRotation = Quaternion.Euler(0, 0, angle);
     }
 }
