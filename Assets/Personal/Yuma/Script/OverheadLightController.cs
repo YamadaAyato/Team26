@@ -9,6 +9,12 @@ public class OverheadLightController : MonoBehaviour
 {
     private const int ELLIPSE_SEGMENT_COUNT = 32;
 
+    private enum MovementAxis
+    {
+        Horizontal,
+        Vertical
+    }
+
     [Header("実際のライト")]
     [SerializeField] private Light2D _overheadLight;
 
@@ -16,11 +22,14 @@ public class OverheadLightController : MonoBehaviour
     [SerializeField] private Transform _lightArea;
 
     [Header("移動設定")]
-    [SerializeField, Tooltip("左右の移動距離。")]
+    [SerializeField, Tooltip("初期位置から左右それぞれに移動する最大距離。")]
     private float _moveDistance = 3f;
 
     [SerializeField, Tooltip("ライトが往復する速さ。")]
     private float _oscillationSpeed = 1f;
+
+    [SerializeField, Tooltip("ライトが移動する方向。")]
+    private MovementAxis _movementAxis = MovementAxis.Horizontal;
 
     [Header("照射範囲のサイズ")]
     [SerializeField, Min(0.1f), Tooltip("照射範囲の横幅。")]
@@ -51,7 +60,6 @@ public class OverheadLightController : MonoBehaviour
     private void Awake()
     {
         _startPosition = transform.position;
-        _elapsedTime = 0f;
     }
 
     /// <summary>
@@ -73,17 +81,23 @@ public class OverheadLightController : MonoBehaviour
     }
 
     /// <summary>
-    ///     ライト自身の経過時間を使って親オブジェクトを左右に移動させる。
+    ///     ライトの経過時間を使って親オブジェクトを指定方向に移動させる。
     /// </summary>
     private void Update()
     {
         _elapsedTime += Time.deltaTime;
 
-        float x =
+        float movement =
             Mathf.Sin(_elapsedTime * _oscillationSpeed) * _moveDistance;
 
-        transform.position =
-            _startPosition + new Vector3(x, 0f, 0f);
+        Vector3 offset = _movementAxis switch
+        {
+            MovementAxis.Horizontal => new Vector3(movement, 0f, 0f),
+            MovementAxis.Vertical => new Vector3(0f, movement, 0f),
+            _ => Vector3.zero
+        };
+
+        transform.position = _startPosition + offset;
     }
 
     /// <summary>
