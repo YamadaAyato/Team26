@@ -63,6 +63,8 @@ public class PlayerMove : MonoBehaviour
     {
         if (collision.gameObject.CompareTag("Corpse"))
         {
+            _corpeCarrier.SetCourpseShot(collision.gameObject);
+            _corpeCarrier.SetHoldCorpse(collision.gameObject);
             _corpeCarrier.ChangeState(_corpeCarrier.HoldingState);
         }
     }
@@ -71,6 +73,7 @@ public class PlayerMove : MonoBehaviour
     {
         if (collision.gameObject.CompareTag("Corpse"))
         {
+            //_corpeCarrier.SetHoldCorpse(null);
             _corpeCarrier.ResetState();
         }
     }

@@ -8,14 +8,20 @@ public class CorpseCarrier : MonoBehaviour
     public ICarryState SpitOutState { get; } = new SpitOutState();
     public bool IsMoving = true;
     public bool IsPickUp => _isPickUp;
-    private bool _isPickUp = false;
+    public GameObject HoldCourpse { get; private set; }
+    public CourpseShot _courpseShot{ get; private set; }
 
+    private bool _isPickUp = false;
     private ICarryState _current;
 
     private void Awake()
     {
         ResetState();
     }
+
+    public void SetCourpseShot(GameObject obj) => _courpseShot = obj.GetComponent<CourpseShot>();
+
+    public void SetHoldCorpse(GameObject corpse) => HoldCourpse = corpse;
 
     /// <summary>
     /// PlayerInputで決めたキーを押したら呼ばれる
