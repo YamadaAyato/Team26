@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class CourpseShot : MonoBehaviour
+public class CorpseShot : MonoBehaviour
 {
     [Header("威力")]
     [SerializeField,Tooltip("ショット時の威力")]
@@ -13,7 +13,7 @@ public class CourpseShot : MonoBehaviour
     }
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    void Awake()
     {
         _rb = GetComponent<Rigidbody2D>();
     }

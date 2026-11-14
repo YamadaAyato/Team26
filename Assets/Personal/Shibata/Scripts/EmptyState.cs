@@ -5,9 +5,6 @@ public class EmptyState : ICarryState
 {
     public void OnInteract(CorpseCarrier carrier)
     {
-        if (carrier.IsPickUp)
-        {
-            carrier.ChangeState(carrier.HoldingState);
-        }
+        //何もしない
     }
 }

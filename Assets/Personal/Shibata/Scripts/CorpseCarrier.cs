@@ -3,15 +3,28 @@ using UnityEngine.InputSystem;
 
 public class CorpseCarrier : MonoBehaviour
 {
-    public ICarryState EmptyState { get; } = new EmptyState();
-    public ICarryState HoldingState { get; } = new HoldingState();
-    public ICarryState SpitOutState { get; } = new SpitOutState();
+    public ICarryState EmptyState => _enmptyState;
+    public ICarryState HoldingState => _holdingState;
+    public ICarryState SpitOutState => _spitOutState;
+
+    private ICarryState _enmptyState = new EmptyState();
+    private ICarryState _holdingState = new HoldingState();
+    private ICarryState _spitOutState = new SpitOutState();
     public bool IsMoving = true;
     public bool IsPickUp => _isPickUp;
+    public bool IsHolding => _isHolding;
     public GameObject HoldCourpse { get; private set; }
-    public CourpseShot _courpseShot{ get; private set; }
+    public CorpseShot CorpseShot{ get; private set; }
 
+    /// <summary>
+    /// 死体の当たり判定に当たっているか
+    /// </summary>
     private bool _isPickUp = false;
+
+    /// <summary>
+    /// 死体を保持しているか
+    /// </summary>
+    private bool _isHolding = false;
     private ICarryState _current;
 
     private void Awake()
@@ -19,8 +32,9 @@ public class CorpseCarrier : MonoBehaviour
         ResetState();
     }
 
-    public void SetCourpseShot(GameObject obj) => _courpseShot = obj.GetComponent<CourpseShot>();
+    public void SetCourpseShot(GameObject obj) => CorpseShot = obj.GetComponent<CorpseShot>();
 
+    //保持している死体を保存
     public void SetHoldCorpse(GameObject corpse) => HoldCourpse = corpse;
 
     /// <summary>
@@ -33,7 +47,15 @@ public class CorpseCarrier : MonoBehaviour
 
         if (_isPickUp)
         {
-            ChangeState(SpitOutState);
+            ChangeState(_holdingState);
+            _isHolding = true;
+            _isPickUp = false;
+        }
+        
+        if (_isHolding)
+        {
+            ChangeState(_spitOutState);
+            _isHolding = false;
         }
 
         _current.OnInteract(this);
@@ -45,9 +67,7 @@ public class CorpseCarrier : MonoBehaviour
     /// <param name="next">次の状態</param>
     public void ChangeState(ICarryState next)
     {
-        _current?.OnExit(this);
         _current = next;
-        _current.OnEnter(this);
     }
 
     /// <summary>
