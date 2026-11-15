@@ -6,24 +6,23 @@ public class CorpseCarrier : MonoBehaviour
     public ICarryState EmptyState => _enmptyState;
     public ICarryState HoldingState => _holdingState;
     public ICarryState SpitOutState => _spitOutState;
+    public bool IsMoving = true;
+    /// <summary>
+    /// 死体の当たり判定に当たっているか
+    /// </summary>
+    public bool IsPickUp => _isPickUp;
+    /// <summary>
+    /// 死体を保持しているか
+    /// </summary>
+    public bool IsHolding => _isHolding;
+    public GameObject HoldCourpse { get; private set; }
+    public CorpseShot CorpseShot { get; private set; }
 
     private ICarryState _enmptyState = new EmptyState();
     private ICarryState _holdingState = new HoldingState();
     private ICarryState _spitOutState = new SpitOutState();
-    public bool IsMoving = true;
-    public bool IsPickUp => _isPickUp;
-    public bool IsHolding => _isHolding;
-    public GameObject HoldCourpse { get; private set; }
-    public CorpseShot CorpseShot{ get; private set; }
 
-    /// <summary>
-    /// 死体の当たり判定に当たっているか
-    /// </summary>
     private bool _isPickUp = false;
-
-    /// <summary>
-    /// 死体を保持しているか
-    /// </summary>
     private bool _isHolding = false;
     private ICarryState _current;
 
@@ -48,14 +47,11 @@ public class CorpseCarrier : MonoBehaviour
         if (_isPickUp)
         {
             ChangeState(_holdingState);
-            _isHolding = true;
-            _isPickUp = false;
         }
-        
+
         if (_isHolding)
         {
             ChangeState(_spitOutState);
-            _isHolding = false;
         }
 
         _current.OnInteract(this);
@@ -75,5 +71,7 @@ public class CorpseCarrier : MonoBehaviour
     /// </summary>
     public void ResetState() => ChangeState(EmptyState);
 
-    public void ChangePickUp(bool pickUp) => _isPickUp = pickUp;
+    public void ChangePickUp(bool ispickUp) => _isPickUp = ispickUp;
+
+    public void ChangeHolding(bool isHolding) => _isHolding = isHolding;
 }

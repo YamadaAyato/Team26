@@ -298,7 +298,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: facd3c66aadb3b24faf0ef5bd6945bd5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CourpseShot
-  _shotSpeed: 2
+  _shotSpeed: 3
 --- !u!1 &714524268
 GameObject:
   m_ObjectHideFlags: 0

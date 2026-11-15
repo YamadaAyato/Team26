@@ -8,6 +8,7 @@ public class SpitOutState : ICarryState
 {
     public void OnInteract(CorpseCarrier carrier)
     {
+        carrier.ChangeHolding(false);
         //プレイヤーの入力の受付を拒否
         var corpse = carrier.HoldCourpse;
         carrier.IsMoving = false;
@@ -21,7 +22,7 @@ public class SpitOutState : ICarryState
 
         //死体の吐き出し処理
         carrier.CorpseShot.Shot();
-        carrier.transform.DOScale(Vector3.one, 1f).OnComplete(() => carrier.IsMoving = true);
+        carrier.transform.DOScale(Vector3.one, 0.5f).OnComplete(() => carrier.IsMoving = true);
 
         //何もない状態にする
         carrier.ResetState();

@@ -73,7 +73,6 @@ public class PlayerMove : MonoBehaviour
     {
         if (collision.gameObject.CompareTag("Corpse"))
         {
-            //_corpeCarrier.SetHoldCorpse(null);
             _corpeCarrier.ResetState();
         }
     }
