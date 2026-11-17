@@ -2,110 +2,131 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class PauseManager : MonoBehaviour
 {
     [Header("Input")]
-    [SerializeField] private InputActionReference pauseAction;
+    [SerializeField] private InputActionReference _pauseAction;
 
     [Header("UI Panels")]
-    [SerializeField] private GameObject pauseMenu;
-    [SerializeField] private GameObject restartConfirm;
-    [SerializeField] private GameObject titleConfirm;
-    [SerializeField] private GameObject optionsPanel;
-    [SerializeField] private GameObject howToPlayPanel;
+    [SerializeField] private Image _pauseMenu;
+    [SerializeField] private Image _restartConfirm;
+    [SerializeField] private Image _titleConfirm;
+    [SerializeField] private Image _optionsPanel;
+    [SerializeField] private Image _howToPlayPanel;
 
     [Header("Scene Settings")]
-    [SerializeField] private string titleSceneName = "Title";
+    [SerializeField] private string _titleSceneName = "Title";
 
-    private bool isPaused = false;
+    public static bool IsPaused { get; private set; }
 
+    /// <summary>
+    /// ゲーム開始時に状態を初期化する
+    /// </summary>
     private void Awake()
     {
+        IsPaused = false;
         Time.timeScale = 1f;
         AudioListener.pause = false;
 
         HideAllPanels();
     }
 
+    /// <summary>
+    /// ポーズ入力のイベントを登録する
+    /// </summary>
     private void OnEnable()
     {
-        if (pauseAction != null)
-        {
-            pauseAction.action.Enable();
-        }
+        if (_pauseAction == null) return;
+
+        _pauseAction.action.performed += OnPausePerformed;
+        _pauseAction.action.Enable();
     }
 
+    /// <summary>
+    /// ポーズ入力のイベント登録を解除する
+    /// </summary>
     private void OnDisable()
     {
-        if (pauseAction != null)
-        {
-            pauseAction.action.Disable();
-        }
+        if (_pauseAction == null) return;
+
+        _pauseAction.action.performed -= OnPausePerformed;
+        _pauseAction.action.Disable();
     }
 
-    private void Update()
+    /// <summary>
+    /// ESCキーでゲームの一時停止と再開を切り替える
+    /// </summary>
+    /// <param name="context">入力情報</param>
+    private void OnPausePerformed(InputAction.CallbackContext context)
     {
-        // ESCキーでポーズ切り替え
-        if (pauseAction != null &&
-            pauseAction.action.WasPressedThisFrame())
+        if (IsPaused)
         {
-            if (isPaused)
-            {
-                ShowPauseMenu();
-            }
-            else
-            {
-                PauseGame();
-            }
+            ResumeGame();
+        }
+        else
+        {
+            PauseGame();
         }
     }
 
-    // ゲーム一時停止
+    /// <summary>
+    /// ゲームを一時停止する
+    /// </summary>
     public void PauseGame()
     {
-        isPaused = true;
-
+        IsPaused = true;
         Time.timeScale = 0f;
         AudioListener.pause = true;
 
         ShowPauseMenu();
     }
 
-    // ゲーム再開
+    /// <summary>
+    /// ゲームを再開する
+    /// </summary>
     public void ResumeGame()
     {
-        isPaused = false;
-
+        IsPaused = false;
         Time.timeScale = 1f;
         AudioListener.pause = false;
 
         HideAllPanels();
     }
 
-    // ポーズメニュー表示
+    /// <summary>
+    /// ポーズメニューを表示する
+    /// </summary>
     public void ShowPauseMenu()
     {
         HideAllPanels();
-        pauseMenu.SetActive(true);
+        _pauseMenu.gameObject.SetActive(true);
     }
 
-    // リスタート確認画面
+    /// <summary>
+    /// リスタート確認画面を表示する
+    /// </summary>
     public void ShowRestartConfirm()
     {
         HideAllPanels();
-        restartConfirm.SetActive(true);
+        _restartConfirm.gameObject.SetActive(true);
     }
 
-    // リスタートをキャンセル
+    /// <summary>
+    /// リスタートをキャンセルする
+    /// </summary>
     public void CancelRestart()
     {
         ShowPauseMenu();
     }
 
-    // リスタート実行
+    /// <summary>
+    /// 現在のステージを最初から開始する
+    /// </summary>
     public void ConfirmRestart()
     {
+        IsPaused = false;
         Time.timeScale = 1f;
         AudioListener.pause = false;
 
@@ -114,55 +135,70 @@ public class PauseManager : MonoBehaviour
         );
     }
 
-    // オプション画面
+    /// <summary>
+    /// オプション画面を表示する
+    /// </summary>
     public void ShowOptions()
     {
         HideAllPanels();
-        optionsPanel.SetActive(true);
+        _optionsPanel.gameObject.SetActive(true);
     }
 
-    // 遊び方画面
+    /// <summary>
+    /// 遊び方画面を表示する
+    /// </summary>
     public void ShowHowToPlay()
     {
         HideAllPanels();
-        howToPlayPanel.SetActive(true);
+        _howToPlayPanel.gameObject.SetActive(true);
     }
 
-    // タイトルに戻る確認画面
+    /// <summary>
+    /// タイトルに戻る確認画面を表示する
+    /// </summary>
     public void ShowTitleConfirm()
     {
         HideAllPanels();
-        titleConfirm.SetActive(true);
+        _titleConfirm.gameObject.SetActive(true);
     }
 
-    // タイトルに戻るのをキャンセル
+    /// <summary>
+    /// タイトルへの移動をキャンセルする
+    /// </summary>
     public void CancelTitle()
     {
         ShowPauseMenu();
     }
 
-    // タイトルに戻る
+    /// <summary>
+    /// タイトルシーンに戻る
+    /// </summary>
     public void ConfirmTitle()
     {
+        IsPaused = false;
         Time.timeScale = 1f;
         AudioListener.pause = false;
 
-        SceneManager.LoadScene(titleSceneName);
+        SceneManager.LoadScene(_titleSceneName);
     }
 
-    // 各画面からポーズメニューに戻る
+    /// <summary>
+    /// ポーズメニューに戻る
+    /// </summary>
     public void BackToPauseMenu()
     {
         ShowPauseMenu();
     }
 
-    // 全パネルを非表示
+    /// <summary>
+    /// すべてのUIパネルを非表示にする
+    /// </summary>
     private void HideAllPanels()
     {
-        pauseMenu.SetActive(false);
-        restartConfirm.SetActive(false);
-        titleConfirm.SetActive(false);
-        optionsPanel.SetActive(false);
-        howToPlayPanel.SetActive(false);
+        _pauseMenu.gameObject.SetActive(false);
+        _restartConfirm.gameObject.SetActive(false);
+        _titleConfirm.gameObject.SetActive(false);
+        _optionsPanel.gameObject.SetActive(false);
+        _howToPlayPanel.gameObject.SetActive(false);
     }
 }
