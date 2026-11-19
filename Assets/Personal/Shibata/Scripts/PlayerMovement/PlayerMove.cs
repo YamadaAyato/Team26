@@ -19,7 +19,7 @@ public class PlayerMove : MonoBehaviour
     /// <param name="context">入力アクションのコールバック情報</param>
     public void Move(InputAction.CallbackContext context)
     {
-        if (context.canceled || !_corpeCarrier.IsMoving)
+        if (context.canceled || !_corpeCarrier.IsMoving || PauseManager.IsPaused)
         {
             _moveVec = Vector2.zero;
             return;
