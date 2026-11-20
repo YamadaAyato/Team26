@@ -8,8 +8,6 @@ public class HoldingState : ICarryState
 {
     public void OnInteract(CorpseCarrier carrier)
     {
-        carrier.ChangeHolding(true);
-        carrier.ChangePickUp(false);
         //プレイヤーが死体の座標に移動
         Vector3 targetPos = carrier.HoldCourpse.transform.position;
 
@@ -17,7 +15,6 @@ public class HoldingState : ICarryState
         Vector2 dir = targetPos - carrier.transform.position;
         float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
         carrier.transform.rotation = Quaternion.Euler(0, 0, angle);
-        carrier.ChangePickUp(true);
 
         //移動入力の受付拒否
         carrier.IsMoving = false;
@@ -28,7 +25,9 @@ public class HoldingState : ICarryState
         void Complete()
         {
             carrier.IsMoving = true;
+            carrier.ChangeHolding(true);
             carrier.HoldCourpse.SetActive(false);
+            carrier.ChangeState(carrier.EmptyState);
         }
     }
 }
