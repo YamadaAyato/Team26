@@ -21,9 +21,13 @@ public class CorpseCarrier : MonoBehaviour
     private ICarryState _enmptyState = new EmptyState();
     private ICarryState _holdingState = new HoldingState();
     private ICarryState _spitOutState = new SpitOutState();
-
+    [Header("長押し設定")]
+    [SerializeField, Tooltip("吐き出しに必要な長押し秒数")]
+    private float _holdTime = 0.5f;
+    private float _pressStartTime = 0; 
     private bool _isPickUp = false;
     private bool _isHolding = false;
+    private bool _isCharging = false; //長押ししているか
     private ICarryState _current;
 
     private void Awake()
@@ -42,19 +46,26 @@ public class CorpseCarrier : MonoBehaviour
     /// <param name="context">入力アクションのコールバック情報</param>
     public void OnInteract(InputAction.CallbackContext context)
     {
-        if (!context.started) return;
+        if (!IsMoving) return;
 
-        if (_isPickUp)
+        if (context.started)
         {
-            ChangeState(_holdingState);
-        }
+            if (_isPickUp)
+            {
+                ChangeState(_holdingState);
+                _current.OnInteract(this);
+            }
 
-        if (_isHolding)
+            if (_isHolding)
+            {
+                _isCharging = true;
+                _pressStartTime = Time.time;
+            }
+        }
+        else if (context.canceled)
         {
-            ChangeState(_spitOutState);
+            _isCharging = false;
         }
-
-        _current.OnInteract(this);
     }
 
     /// <summary>
@@ -69,9 +80,22 @@ public class CorpseCarrier : MonoBehaviour
     /// <summary>
     /// 何も持っていない状態に戻す
     /// </summary>
-    public void ResetState() => ChangeState(EmptyState);
+    public void ResetState()
+    {
+        ChangeState(EmptyState);
+    }
 
     public void ChangePickUp(bool ispickUp) => _isPickUp = ispickUp;
 
     public void ChangeHolding(bool isHolding) => _isHolding = isHolding;
+
+    private void Update()
+    {
+        if (!IsMoving || !_isCharging || Time.time - _pressStartTime < _holdTime) return;
+
+        //長押しが成立したら吐き出しする
+        _isCharging = false;
+        ChangeState(_spitOutState);
+        _current.OnInteract(this);
+    }
 }

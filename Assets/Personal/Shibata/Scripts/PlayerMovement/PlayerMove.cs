@@ -65,7 +65,7 @@ public class PlayerMove : MonoBehaviour
         {
             _corpeCarrier.SetCourpseShot(collision.gameObject);
             _corpeCarrier.SetHoldCorpse(collision.gameObject);
-            _corpeCarrier.ChangeState(_corpeCarrier.HoldingState);
+            _corpeCarrier.ChangePickUp(true);
         }
     }
 
@@ -74,6 +74,7 @@ public class PlayerMove : MonoBehaviour
         if (collision.gameObject.CompareTag("Corpse"))
         {
             _corpeCarrier.ResetState();
+            _corpeCarrier.ChangePickUp(false);
         }
     }
 }

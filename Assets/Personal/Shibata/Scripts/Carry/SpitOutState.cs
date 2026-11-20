@@ -12,7 +12,6 @@ public class SpitOutState : ICarryState
         //プレイヤーの入力の受付を拒否
         var corpse = carrier.HoldCourpse;
         carrier.IsMoving = false;
-        carrier.ChangePickUp(false);
 
         //死体をプレイヤーの座標に移動
         corpse.transform.rotation = carrier.transform.rotation;
