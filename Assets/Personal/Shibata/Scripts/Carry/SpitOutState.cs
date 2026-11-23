@@ -16,7 +16,6 @@ public class SpitOutState : ICarryState
         //死体をプレイヤーの座標に移動
         corpse.transform.rotation = carrier.transform.rotation;
         corpse.transform.position = carrier.transform.position;
-        carrier.SetHoldCorpse(corpse);
         carrier.HoldCourpse.SetActive(true);
 
         //死体の吐き出し処理

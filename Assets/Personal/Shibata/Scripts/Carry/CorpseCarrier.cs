@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -21,14 +22,14 @@ public class CorpseCarrier : MonoBehaviour
     private ICarryState _enmptyState = new EmptyState();
     private ICarryState _holdingState = new HoldingState();
     private ICarryState _spitOutState = new SpitOutState();
+    private ICarryState _current;
     [Header("長押し設定")]
     [SerializeField, Tooltip("吐き出しに必要な長押し秒数")]
     private float _holdTime = 0.5f;
-    private float _pressStartTime = 0; 
+    private float _pressStartTime = 0;
     private bool _isPickUp = false;
     private bool _isHolding = false;
     private bool _isCharging = false; //長押ししているか
-    private ICarryState _current;
 
     private void Awake()
     {
@@ -38,7 +39,11 @@ public class CorpseCarrier : MonoBehaviour
     public void SetCourpseShot(GameObject obj) => CorpseShot = obj.GetComponent<CorpseShot>();
 
     //保持している死体を保存
-    public void SetHoldCorpse(GameObject corpse) => HoldCourpse = corpse;
+    public void SetHoldCorpse(GameObject obj)
+    {
+        HoldCourpse = obj;
+    }
+
 
     /// <summary>
     /// PlayerInputで決めたキーを押したら呼ばれる
@@ -46,25 +51,24 @@ public class CorpseCarrier : MonoBehaviour
     /// <param name="context">入力アクションのコールバック情報</param>
     public void OnInteract(InputAction.CallbackContext context)
     {
-        if (!IsMoving) return;
+        if (context.canceled || !IsMoving)
+        {
+            _isCharging = false;
+            return;
+        }
 
         if (context.started)
         {
-            if (_isPickUp)
+            if (_isPickUp && !_isHolding)
             {
                 ChangeState(_holdingState);
                 _current.OnInteract(this);
             }
-
-            if (_isHolding)
+            else if (_isHolding)
             {
                 _isCharging = true;
                 _pressStartTime = Time.time;
             }
-        }
-        else if (context.canceled)
-        {
-            _isCharging = false;
         }
     }
 
