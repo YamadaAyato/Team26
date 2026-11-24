@@ -1,0 +1,6 @@
+{
+    "name": "Yamamoto.AudioTools.Editor",
+    "rootNamespace": "Yamamoto.AudioTools.Editor",
+    "references": [ "Yamamoto.AudioTools" ],
+    "includePlatforms": [ "Editor" ]
+}

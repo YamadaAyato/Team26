@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 72a5d0b4e7357288789ef8e6268820b5, type: 3}
+  m_Name: Title
+  m_EditorClassIdentifier: Yamamoto.AudioTools::Yamamoto.AudioTools.AudioGroup
+  _category: 0
+  _mode: 0
+  _fixedClip: {fileID: 8300000, guid: f6290056146482c498058256865eeb74, type: 3}
+  _entries:
+  - _clip: {fileID: 8300000, guid: f6290056146482c498058256865eeb74, type: 3}
+    _gain: 1
+  _voiceLimit: 8
+  _minInterval: 0
+  _folderGuid: c7d9c8f566cc3134cbd835c19e15d2b0
