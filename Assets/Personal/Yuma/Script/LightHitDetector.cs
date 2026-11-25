@@ -1,10 +1,9 @@
 
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Rendering.Universal;
 
 /// <summary>
-///     横向きライトがプレイヤーに届いているか判定する。
+///     ライトがプレイヤーに届いているか判定する。
 /// </summary>
 public class LightHitDetector : MonoBehaviour
 {
@@ -20,6 +19,9 @@ public class LightHitDetector : MonoBehaviour
     [Header("ライト設定")]
     [SerializeField, Tooltip("判定対象の横向きライト。")]
     private Light2D[] _spotLights;
+
+    [SerializeField, Tooltip("判定対象の上方ライト。")]
+    private OverheadLightController[] _overheadLights;
 
     [Header("遮光設定")]
     [SerializeField, Tooltip("光を遮る壁や家具のレイヤー。")]
@@ -62,6 +64,22 @@ public class LightHitDetector : MonoBehaviour
         {
             _isWarning = false;
         }
+    }
+
+    /// <summary>
+    ///     死亡時の処理を行う。
+    /// </summary>
+    private void Death()
+    {
+        Debug.Log("即死");
+    }
+
+    /// <summary>
+    ///     警告時の処理を行う。
+    /// </summary>
+    private void Warning()
+    {
+        Debug.Log("警告");
     }
 
     /// <summary>
@@ -129,43 +147,68 @@ public class LightHitDetector : MonoBehaviour
     /// </summary>
     /// <param name="targetPosition">判定する位置。</param>
     /// <returns>ライトが届いていればtrue。</returns>
-    private bool IsPointIlluminated(Vector2 targetPosition)
+    public bool IsPointIlluminated(Vector2 targetPosition)
     {
-        if (_spotLights == null)
+        // 横向きライトの判定。
+        if (_spotLights != null)
         {
-            return false;
+            foreach (Light2D spotLight in _spotLights)
+            {
+                if (spotLight == null || !spotLight.isActiveAndEnabled)
+                {
+                    continue;
+                }
+
+                Vector2 lightPosition = spotLight.transform.position;
+                Vector2 direction = targetPosition - lightPosition;
+
+                float distance = direction.magnitude;
+
+                if (distance <= 0f ||
+                    distance > spotLight.pointLightOuterRadius)
+                {
+                    continue;
+                }
+
+                float angle = Vector2.Angle(
+                    spotLight.transform.up,
+                    direction
+                );
+
+                if (angle > spotLight.pointLightOuterAngle * 0.5f)
+                {
+                    continue;
+                }
+
+                if (!IsBlocked(lightPosition, targetPosition))
+                {
+                    return true;
+                }
+            }
         }
 
-        foreach (Light2D spotLight in _spotLights)
+        // 上方ライトの判定。
+        if (_overheadLights != null)
         {
-            if (spotLight == null || !spotLight.isActiveAndEnabled)
+            foreach (OverheadLightController overheadLight in _overheadLights)
             {
-                continue;
-            }
+                if (overheadLight == null)
+                {
+                    continue;
+                }
 
-            Vector2 lightPosition = spotLight.transform.position;
-            Vector2 direction = targetPosition - lightPosition;
+                Light2D light = overheadLight.OverheadLight;
 
-            float distance = direction.magnitude;
+                if (light == null || !light.isActiveAndEnabled)
+                {
+                    continue;
+                }
 
-            if (distance <= 0f ||
-                distance > spotLight.pointLightOuterRadius)
-            {
-                continue;
-            }
+                if (!overheadLight.IsPositionInsideLightArea(targetPosition))
+                {
+                    continue;
+                }
 
-            float angle = Vector2.Angle(
-                spotLight.transform.up,
-                direction
-            );
-
-            if (angle > spotLight.pointLightOuterAngle * 0.5f)
-            {
-                continue;
-            }
-
-            if (!IsBlocked(lightPosition, targetPosition))
-            {
                 return true;
             }
         }

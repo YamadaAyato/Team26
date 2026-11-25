@@ -41,6 +41,45 @@ public class OverheadLightController : MonoBehaviour
     private Vector3 _startPosition;
     private float _elapsedTime;
 
+
+    /// <summary>
+    ///     ライトの照射範囲の横幅を取得する。
+    /// </summary>
+    public float LightWidth => _lightWidth;
+
+    /// <summary>
+    ///     ライトの照射範囲の高さを取得する。
+    /// </summary>
+    public float LightHeight => _lightHeight;
+    /// <summary>
+    ///     上方ライトのLight2Dを取得する。
+    /// </summary>
+    public Light2D OverheadLight => _overheadLight;
+
+    /// <summary>
+    ///     指定した位置が上方ライトの照射範囲内か判定する。
+    /// </summary>
+    /// <param name="targetPosition">判定する位置。</param>
+    /// <returns>照射範囲内ならtrue。</returns>
+    public bool IsPositionInsideLightArea(Vector2 targetPosition)
+    {
+        Vector3 localPosition =
+            transform.InverseTransformPoint(targetPosition);
+
+        // Freeform LightのFalloff分も判定範囲に加える。
+        float falloff = _overheadLight.shapeLightFalloffSize;
+
+        float radiusX = _lightWidth * 0.5f + falloff;
+        float radiusY = _lightHeight * 0.5f + falloff;
+
+        float normalizedX = localPosition.x / radiusX;
+        float normalizedY = localPosition.y / radiusY;
+
+        return normalizedX * normalizedX +
+               normalizedY * normalizedY <= 1f;
+    }
+
+
     /// <summary>
     ///     Inspectorの設定変更を反映する。
     /// </summary>
