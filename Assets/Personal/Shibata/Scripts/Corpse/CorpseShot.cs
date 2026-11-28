@@ -1,20 +1,28 @@
+using DG.Tweening;
 using UnityEngine;
 
 public class CorpseShot : MonoBehaviour
 {
-    [Header("威力")]
+    [Header("時間")]
     [SerializeField,Tooltip("ショット時の威力")]
     private float _shotSpeed = 2;
-    private Rigidbody2D _rb;
+    private GridHelper _gridHelper;
 
-    public void Shot()
+    public void Shot(Transform player)
     {
-        _rb.AddForce(transform.right * _shotSpeed, ForceMode2D.Impulse);
+        Vector3Int pos;
+        pos = _gridHelper.GetCellAhead(player.position,player.right);
+        transform.DOMove(pos, _shotSpeed);
+
+        Vector3 dir = (pos - transform.position).normalized;
+        float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
+        player.transform.rotation = Quaternion.Euler(0, 0, angle);
+        transform.rotation = Quaternion.Euler(0, 0, angle);
     }
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Awake()
     {
-        _rb = GetComponent<Rigidbody2D>();
+        _gridHelper = GetComponent<GridHelper>();
     }
 }
