@@ -8,6 +8,9 @@ public class HoldingState : ICarryState
 {
     public void OnInteract(CorpseCarrier carrier)
     {
+        //isHoldingをture
+        carrier.ChangeHolding(true);
+
         //プレイヤーが死体の座標に移動
         Vector3 targetPos = carrier.HoldCourpse.transform.position;
 
@@ -25,7 +28,6 @@ public class HoldingState : ICarryState
         void Complete()
         {
             carrier.IsMoving = true;
-            carrier.ChangeHolding(true);
             carrier.HoldCourpse.SetActive(false);
             carrier.ChangeState(carrier.EmptyState);
         }
