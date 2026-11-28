@@ -61,11 +61,11 @@ public class PlayerMove : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if (collision.gameObject.CompareTag("Corpse"))
+        if (collision.gameObject.CompareTag("Corpse") && !_corpeCarrier.IsHolding)
         {
             _corpeCarrier.SetCourpseShot(collision.gameObject);
+            _corpeCarrier.ChangePickUp(true);
             _corpeCarrier.SetHoldCorpse(collision.gameObject);
-            _corpeCarrier.ChangeState(_corpeCarrier.HoldingState);
         }
     }
 
@@ -74,6 +74,7 @@ public class PlayerMove : MonoBehaviour
         if (collision.gameObject.CompareTag("Corpse"))
         {
             _corpeCarrier.ResetState();
+            _corpeCarrier.ChangePickUp(false);
         }
     }
 }

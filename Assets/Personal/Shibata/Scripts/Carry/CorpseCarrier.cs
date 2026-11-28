@@ -21,10 +21,14 @@ public class CorpseCarrier : MonoBehaviour
     private ICarryState _enmptyState = new EmptyState();
     private ICarryState _holdingState = new HoldingState();
     private ICarryState _spitOutState = new SpitOutState();
-
+    private ICarryState _current;
+    [Header("長押し設定")]
+    [SerializeField, Tooltip("吐き出しに必要な長押し秒数")]
+    private float _holdTime = 0.5f;
+    private float _pressStartTime = 0;
     private bool _isPickUp = false;
     private bool _isHolding = false;
-    private ICarryState _current;
+    private bool _isCharging = false; //長押ししているか
 
     private void Awake()
     {
@@ -34,7 +38,11 @@ public class CorpseCarrier : MonoBehaviour
     public void SetCourpseShot(GameObject obj) => CorpseShot = obj.GetComponent<CorpseShot>();
 
     //保持している死体を保存
-    public void SetHoldCorpse(GameObject corpse) => HoldCourpse = corpse;
+    public void SetHoldCorpse(GameObject obj)
+    {
+        HoldCourpse = obj;
+    }
+
 
     /// <summary>
     /// PlayerInputで決めたキーを押したら呼ばれる
@@ -42,19 +50,25 @@ public class CorpseCarrier : MonoBehaviour
     /// <param name="context">入力アクションのコールバック情報</param>
     public void OnInteract(InputAction.CallbackContext context)
     {
-        if (!context.started) return;
-
-        if (_isPickUp)
+        if (context.canceled || !IsMoving)
         {
-            ChangeState(_holdingState);
+            _isCharging = false;
+            return;
         }
 
-        if (_isHolding)
+        if (context.started)
         {
-            ChangeState(_spitOutState);
+            if (_isPickUp && !_isHolding)
+            {
+                ChangeState(_holdingState);
+                _current.OnInteract(this);
+            }
+            else if (_isHolding)
+            {
+                _isCharging = true;
+                _pressStartTime = Time.time;
+            }
         }
-
-        _current.OnInteract(this);
     }
 
     /// <summary>
@@ -69,9 +83,22 @@ public class CorpseCarrier : MonoBehaviour
     /// <summary>
     /// 何も持っていない状態に戻す
     /// </summary>
-    public void ResetState() => ChangeState(EmptyState);
+    public void ResetState()
+    {
+        ChangeState(EmptyState);
+    }
 
     public void ChangePickUp(bool ispickUp) => _isPickUp = ispickUp;
 
     public void ChangeHolding(bool isHolding) => _isHolding = isHolding;
+
+    private void Update()
+    {
+        if (!IsMoving || !_isCharging || Time.time - _pressStartTime < _holdTime) return;
+
+        //長押しが成立したら吐き出しする
+        _isCharging = false;
+        ChangeState(_spitOutState);
+        _current.OnInteract(this);
+    }
 }
